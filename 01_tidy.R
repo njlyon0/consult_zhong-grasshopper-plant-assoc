@@ -10,7 +10,7 @@
 ## --------------------------------- ##
 
 # Load libraries
-librarian::shelf(tidyverse)
+librarian::shelf(tidyverse, supportR)
 
 # Clear environment
 rm(list = ls()); gc()
@@ -164,14 +164,156 @@ write.csv(x = df20_forbs, row.names = F, na = '',
 rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
 
 ## --------------------------------- ##
-# ----
+# Wrangle 2022 Sheet (Leaf) ----
 ## --------------------------------- ##
 
 # Do needed wrangling
-df22_leaf <- df22_v0
+df22_leaf <- df22_v0 %>%
+  # Grab desired columns
+  dplyr::select(`August, 2022, L. chinensis biomass, in the 2 m2 mesocosms`,
+                ...3:...6,
+                `August, 2020...8`, `2021...9`, `2022...10`) %>%
+  # Drop any completely empty columns
+  dplyr::select(-dplyr::where(fn = ~ all(is.na(.)))) %>%
+  # Rename columns based on 'real' column name row
+  supportR::safe_rename(data = ., bad_names = names(.),
+                        good_names = c("block", "treatment_forb", "treatment_predator",
+                                       "leychin_biomass_g_m2", "leaf.dmg_2020",
+                                       "leaf.dmg_2021", "leaf.dmg_2022")) %>%
+  # Drop unwanted row(s)
+  dplyr::filter(block != "Block") %>%
+  # Rotate longer
+  tidyr::pivot_longer(cols = dplyr::contains("leaf.dmg"),
+                      values_to = "leaf_damage_perc") %>%
+  # Break apart 'name' column
+  tidyr::separate_wider_delim(cols = name, names = c("junk", "year"), delim = "_") %>%
+  # Ditch leftover junk
+  dplyr::select(-junk) %>%
+  # Relocate date information columns
+  dplyr::relocate(year, .before = block) %>%
+  dplyr::mutate(month = 8, .after = year) %>%
+  # Get things in correct classes
+  dplyr::mutate(dplyr::across(.cols = dplyr::contains(c("year", "biomass", "damage")),
+                              .fns = as.numeric)) %>%
+  dplyr::mutate(block = paste0("block ", block))
 
 # Check structure
 dplyr::glimpse(df22_leaf)
+
+# Export locally
+write.csv(x = df22_leaf, row.names = F, na = '',
+          file = file.path("data", "zhong_2020-2022_plants.csv"))
+
+# Clear environment
+rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
+
+## --------------------------------- ##
+# Wrangle 2022 Sheet (Grasshopper) ----
+## --------------------------------- ##
+
+# Do needed wrangling
+df22_ghop <- df22_v0 %>%
+  # Grab desired columns
+  dplyr::select(`August, 2022, L. chinensis biomass, in the 2 m2 mesocosms`,
+                ...3:...5,
+                `August, 2020...14`, `2021...15`, `2022...16`,
+                `August, 2020...19`, `2021...20`, `2022...21`,
+                `August, 2020...24`, `2021...25`, `2022...26`,
+                `August, 2020...29`, `2021...30`, `2022...31`) %>%
+  # Drop any completely empty columns
+  dplyr::select(-dplyr::where(fn = ~ all(is.na(.)))) %>%
+  # Rename columns based on 'real' column name row
+  supportR::safe_rename(data = ., bad_names = names(.),
+                        good_names = c("block", "treatment_forb", "treatment_predator",
+                                       "ghop.feed_2020", "ghop.feed_2021", "ghop.feed_2022",
+                                       "ghop.walk_2020", "ghop.walk_2021", "ghop.walk_2022",
+                                       "ghop.jump_2020", "ghop.jump_2021", "ghop.jump_2022",
+                                       "ghop.miss_2020", "ghop.miss_2021", "ghop.miss_2022")) %>%
+  # Drop unwanted row(s)
+  dplyr::filter(block != "Block") %>%
+  # Rotate longer
+  tidyr::pivot_longer(cols = dplyr::contains("ghop"),
+                      values_to = "count") %>%
+  # Break apart 'name' column
+  tidyr::separate_wider_delim(cols = name, names = c("behavior", "year"), delim = "_") %>%
+  # Tidy up the 'behavior' entries for use as columns
+  dplyr::mutate(behavior = dplyr::case_when(
+    behavior == "ghop.feed" ~ "grasshopper_feed_times_4h",
+    behavior == "ghop.walk" ~ "grasshopper_walk_times_4h",
+    behavior == "ghop.jump" ~ "grasshopper_jump_times_4h",
+    behavior == "ghop.miss" ~ "grasshopper_missing_count")) %>%
+  # Pivot back to (slightly) wide format
+  tidyr::pivot_wider(names_from = behavior, values_from = count) %>%
+  # Relocate date information columns
+  dplyr::relocate(year, .before = block) %>%
+  dplyr::mutate(month = 8, .after = year) %>%
+  # Get things in correct classes
+  dplyr::mutate(dplyr::across(.cols = dplyr::contains(c("year", "grasshopper")),
+                              .fns = as.numeric)) %>%
+  dplyr::mutate(block = paste0("block ", block)) %>%
+  # Compute mortality
+  dplyr::mutate(grasshopper_mortality_perc = (grasshopper_missing_count / 30) * 100)
+
+# Check structure
+dplyr::glimpse(df22_ghop)
+
+# Export locally
+write.csv(x = df22_ghop, row.names = F, na = '',
+          file = file.path("data", "zhong_2020-2022_grasshoppers.csv"))
+
+# Clear environment
+rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
+
+## --------------------------------- ##
+# Wrangle 2022 Sheet (Mantis) ----
+## --------------------------------- ##
+
+# Do needed wrangling
+df22_mantis <- df22_v0 %>%
+  # Grab desired columns
+  dplyr::select(...39:...41,
+                `August, 2020...43`, `2021...44`, `2022...45`,
+                `August, 2020...48`, `2021...49`, `2022...50`,
+                `August, 2020...53`, `2021...54`, `2022...55`) %>%
+  # Drop any completely empty columns
+  dplyr::select(-dplyr::where(fn = ~ all(is.na(.)))) %>%
+  # Rename columns based on 'real' column name row
+  supportR::safe_rename(data = ., bad_names = names(.),
+                        good_names = c("block", "treatment_forb", "treatment_predator",
+                                       "mant.walk_2020", "mant.walk_2021", "mant.walk_2022",
+                                       "mant.jump_2020", "mant.jump_2021", "mant.jump_2022",
+                                       "mant.atk_2020", "mant.atk_2021", "mant.atk_2022")) %>%
+  # Drop unwanted row(s)
+  dplyr::filter(block != "Block") %>%
+  # Rotate longer
+  tidyr::pivot_longer(cols = dplyr::contains("mant"),
+                      values_to = "count") %>%
+  # Break apart 'name' column
+  tidyr::separate_wider_delim(cols = name, names = c("behavior", "year"), delim = "_") %>%
+  # Tidy up the 'behavior' entries for use as columns
+  dplyr::mutate(behavior = dplyr::case_when(
+    behavior == "mant.walk" ~ "mantis_walk_times_4h",
+    behavior == "mant.jump" ~ "mantis_jump_times_4h",
+    behavior == "mant.atk" ~ "mantis_attack_times_4h")) %>%
+  # Pivot back to (slightly) wide format
+  tidyr::pivot_wider(names_from = behavior, values_from = count) %>%
+  # Relocate date information columns
+  dplyr::relocate(year, .before = block) %>%
+  dplyr::mutate(month = 8, .after = year) %>%
+  # Get things in correct classes
+  dplyr::mutate(dplyr::across(.cols = dplyr::contains(c("year", "mantis")),
+                              .fns = as.numeric)) %>%
+  dplyr::mutate(block = paste0("block ", block))
+
+# Check structure
+dplyr::glimpse(df22_mantis)
+
+# Export locally
+write.csv(x = df22_mantis, row.names = F, na = '',
+          file = file.path("data", "zhong_2020-2022_mantis.csv"))
+
+# Clear environment
+rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
 
 
 
