@@ -26,7 +26,7 @@ df19_v1 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and
 # Isolate first table of info
 df19_plants <- df19_v1 %>%
   # Grab just needed columns
-  dplyr::select(`Plant and arthropod variables in the 30 1 ×1mpermanent sampling plotsinfield surveys of 2019`:...3) %>%
+  dplyr::select(`Plant and arthropod variables in the 30 1 ×1mpermanent sampling plotsinfield surveys of 2019`:...4) %>%
   # Rename columns with actual column name row
   supportR::safe_rename(data = ., bad_names = names(.),
                         good_names = as.character(.[2, ])) %>%
@@ -34,7 +34,9 @@ df19_plants <- df19_v1 %>%
   dplyr::filter(!plot %in% c("mid-August, 2019", "plot")) %>%
   # Make column names clearer
   dplyr::rename(forb_cover_perc = `Forb cover (%)`,
-                leychin_cover_perc = `Leymus chinesis cover (%)`) %>%
+                leychin_cover_perc = `Leymus chinesis cover (%)`,
+                leychin_leaf_damage_perc = `Leaf area damage of Leymus grass (%)_Average of 10 leaves`
+                ) %>%
   # Add some useful other information that was in the original headers
   dplyr::mutate(year = 2019,
                 month = 8,
