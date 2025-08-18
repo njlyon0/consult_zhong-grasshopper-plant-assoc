@@ -20,11 +20,11 @@ rm(list = ls()); gc()
 ## --------------------------------- ##
 
 # Load the relevant sheet from that file
-df19_v0 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and mantis.xlsx"),
+df19_v1 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and mantis.xlsx"),
                               sheet = "2019 field surveys")
 
 # Isolate first table of info
-df19_plants <- df19_v0 %>%
+df19_plants <- df19_v1 %>%
   # Grab just needed columns
   dplyr::select(`Plant and arthropod variables in the 30 1 ×1mpermanent sampling plotsinfield surveys of 2019`:...3) %>%
   # Rename columns with actual column name row
@@ -51,7 +51,7 @@ write.csv(x = df19_plants, row.names = F, na = '',
           file = file.path("data", "zhong_2019_field-surveys_plants.csv"))
 
 # Isolate grasshopper info
-df19_ghop <- df19_v0 %>%
+df19_ghop <- df19_v1 %>%
   # Grab just needed columns
   dplyr::select(...6:...14) %>%
   # Rename columns with actual column name row
@@ -67,7 +67,7 @@ df19_ghop <- df19_v0 %>%
 dplyr::glimpse(df19_ghop)
 
 # Isolate mantis info
-df19_mant <- df19_v0 %>%
+df19_mant <- df19_v1 %>%
   # Grab just needed columns
   dplyr::select(...18:...26) %>%
   # Rename columns with actual column name row
@@ -113,11 +113,11 @@ rm(list = ls()); gc()
 ## --------------------------------- ##
 
 # Load the relevant sheet from that file
-df20_v0 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and mantis.xlsx"),
+df20_v1 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and mantis.xlsx"),
                               sheet = "2020 original conditions")
 
 # Tidy the single table in the 2020 sheet
-df20_forbs <- df20_v0 %>%
+df20_forbs <- df20_v1 %>%
   # Drop empty columns
   dplyr::select(-dplyr::where(fn = ~ all(is.na(.)))) %>%
   # Rename columns with actual column name row
@@ -156,11 +156,11 @@ rm(list = ls()); gc()
 ## --------------------------------- ##
 
 # Load the relevant sheet from that file
-df22_v0 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and mantis.xlsx"),
+df22_v1 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and mantis.xlsx"),
                               sheet = "2022 treatment effects")
 
 # Do needed wrangling for plant data
-df22_leaf <- df22_v0 %>%
+df22_leaf <- df22_v1 %>%
   # Grab desired columns
   dplyr::select(`August, 2022, L. chinensis biomass, in the 2 m2 mesocosms`,
                 ...3:...6,
@@ -193,7 +193,7 @@ df22_leaf <- df22_v0 %>%
 dplyr::glimpse(df22_leaf)
 
 # Do needed wrangling for grasshopper data
-df22_ghop <- df22_v0 %>%
+df22_ghop <- df22_v1 %>%
   # Grab desired columns
   dplyr::select(`August, 2022, L. chinensis biomass, in the 2 m2 mesocosms`,
                 ...3:...5,
@@ -239,7 +239,7 @@ df22_ghop <- df22_v0 %>%
 dplyr::glimpse(df22_ghop)
 
 # Do needed wrangling for mantis data
-df22_mantis <- df22_v0 %>%
+df22_mantis <- df22_v1 %>%
   # Grab desired columns
   dplyr::select(...39:...41,
                 `August, 2020...43`, `2021...44`, `2022...45`,
