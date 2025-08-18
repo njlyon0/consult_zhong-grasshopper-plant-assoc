@@ -59,6 +59,9 @@ dplyr::glimpse(df19_plants)
 write.csv(x = df19_plants, row.names = F, na = '',
           file = file.path("data", "zhong_2019_plants.csv"))
 
+# Clear environment
+rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
+
 ## --------------------------------- ##
 # Wrangle 2019 Sheet (Arthropods) ----
 ## --------------------------------- ##
@@ -118,6 +121,9 @@ dplyr::glimpse(df19_arthro)
 write.csv(x = df19_arthro, row.names = F, na = '',
           file = file.path("data", "zhong_2019_arthropods.csv"))
 
+# Clear environment
+rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
+
 ## --------------------------------- ##
 # Wrangle 2020 Sheet ----
 ## --------------------------------- ##
@@ -154,8 +160,19 @@ dplyr::glimpse(df20_forbs)
 write.csv(x = df20_forbs, row.names = F, na = '',
           file = file.path("data", "zhong_2020_plants.csv"))
 
+# Clear environment
+rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
+
 ## --------------------------------- ##
 # ----
 ## --------------------------------- ##
+
+# Do needed wrangling
+df22_leaf <- df22_v0
+
+# Check structure
+dplyr::glimpse(df22_leaf)
+
+
 
 # End ----
