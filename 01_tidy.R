@@ -10,7 +10,7 @@
 ## --------------------------------- ##
 
 # Load libraries
-librarian::shelf(tidyverse, googledrive)
+librarian::shelf(tidyverse)
 
 # Clear environment
 rm(list = ls()); gc()
@@ -29,7 +29,7 @@ df20_v0 <- readxl::read_excel(path = raw_path, sheet = "2020 original conditions
 df22_v0 <- readxl::read_excel(path = raw_path, sheet = "2022 treatment effects")
 
 ## --------------------------------- ##
-# Wrangle 2019 Sheet ----
+# Wrangle 2019 Sheet (Plants) ----
 ## --------------------------------- ##
 
 # Isolate first table of info
@@ -54,6 +54,14 @@ df19_plants <- df19_v0 %>%
 
 # Check structure of result
 dplyr::glimpse(df19_plants)
+
+# Export locally
+write.csv(x = df19_plants, row.names = F, na = '',
+          file = file.path("data", "zhong_2019_plants.csv"))
+
+## --------------------------------- ##
+# Wrangle 2019 Sheet (Arthropods) ----
+## --------------------------------- ##
 
 # Isolate grasshopper info
 df19_ghop <- df19_v0 %>%
@@ -106,6 +114,9 @@ df19_arthro <- df19_ghop %>%
 # Check structure again
 dplyr::glimpse(df19_arthro)
 
+# Export locally
+write.csv(x = df19_arthro, row.names = F, na = '',
+          file = file.path("data", "zhong_2019_arthropods.csv"))
 
 
 ## --------------------------------- ##
