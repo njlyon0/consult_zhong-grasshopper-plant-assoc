@@ -36,7 +36,7 @@ df19_plants <- df19_v1 %>%
   dplyr::rename(forb_cover_perc = `Forb cover (%)`,
                 leychin_cover_perc = `Leymus chinesis cover (%)`,
                 leychin_leaf_damage_perc = `Leaf area damage of Leymus grass (%)_Average of 10 leaves`
-                ) %>%
+  ) %>%
   # Add some useful other information that was in the original headers
   dplyr::mutate(year = 2019,
                 month = 8,
@@ -161,19 +161,47 @@ rm(list = ls()); gc()
 df22_v1 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and mantis.xlsx"),
                               sheet = "2022 treatment effects")
 
+# Do needed wrangling for L. chinensis biomass
+df22_lechin <- df22_v1 %>%
+  # Grab desired columns
+  dplyr::select(`August, 2022, L. chinensis biomass, in the 2 m2 mesocosms`,
+                ...3:...6) %>%
+  # Drop any completely empty columns
+  dplyr::select(-dplyr::where(fn = ~ all(is.na(.)))) %>%
+  # Rename columns based on 'real' column name row
+  supportR::safe_rename(data = ., bad_names = names(.),
+                        good_names = c("block", "treatment_forb", "treatment_predator",
+                                       "leychin_biomass_g_m2")) %>%
+  # Drop unwanted row(s)
+  dplyr::filter(block != "Block") %>%
+  # Relocate date information columns
+  dplyr::mutate(year = 2022,
+                month = 8,
+                .before = block) %>%
+  # Get things in correct classes
+  dplyr::mutate(dplyr::across(.cols = dplyr::contains(c("year", "biomass")),
+                              .fns = as.numeric)) %>%
+  dplyr::mutate(block = paste0("block ", block))
+
+# Check structure
+dplyr::glimpse(df22_lechin)
+
+# Export locally
+write.csv(x = df22_lechin, row.names = F, na = '',
+          file = file.path("data", "zhong_2020-2022_treatment-effects_leymus-chinesis-biomass.csv"))
+
 # Do needed wrangling for plant data
 df22_leaf <- df22_v1 %>%
   # Grab desired columns
   dplyr::select(`August, 2022, L. chinensis biomass, in the 2 m2 mesocosms`,
-                ...3:...6,
+                ...3:...4,
                 `August, 2020...8`, `2021...9`, `2022...10`) %>%
   # Drop any completely empty columns
   dplyr::select(-dplyr::where(fn = ~ all(is.na(.)))) %>%
   # Rename columns based on 'real' column name row
   supportR::safe_rename(data = ., bad_names = names(.),
                         good_names = c("block", "treatment_forb", "treatment_predator",
-                                       "leychin_biomass_g_m2", "leaf.dmg_2020",
-                                       "leaf.dmg_2021", "leaf.dmg_2022")) %>%
+                                       "leaf.dmg_2020", "leaf.dmg_2021", "leaf.dmg_2022")) %>%
   # Drop unwanted row(s)
   dplyr::filter(block != "Block") %>%
   # Rotate longer
@@ -280,13 +308,11 @@ df22_mantis <- df22_v1 %>%
 # Check structure
 dplyr::glimpse(df22_mantis)
 
-# Need to join these together into one data object
+# Need to join leaf damage, grasshoppers, and mantis info together into one data object
 df22_v2 <- df22_leaf %>%
-  # Attach grasshopper data
   dplyr::full_join(x = ., y = df22_ghop,
                    by = c("year", "month", "block",
                           "treatment_forb", "treatment_predator")) %>%
-  # Then attach mantis data
   dplyr::full_join(x = ., y = df22_mantis,
                    by = c("year", "month", "block",
                           "treatment_forb", "treatment_predator"))
@@ -296,7 +322,7 @@ dplyr::glimpse(df22_v2)
 
 # Export locally
 write.csv(x = df22_v2, row.names = F, na = '',
-          file = file.path("data", "zhong_2020-2022_treatment-effects.csv"))
+          file = file.path("data", "zhong_2020-2022_treatment-effects_other.csv"))
 
 # Clear environment
 rm(list = ls()); gc()
