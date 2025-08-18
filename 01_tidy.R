@@ -16,21 +16,12 @@ librarian::shelf(tidyverse, supportR)
 rm(list = ls()); gc()
 
 ## --------------------------------- ##
-# Load Data ----
+# Wrangle 2019 Sheet ----
 ## --------------------------------- ##
 
-# Identify file path to Excel file
-raw_path <- file.path("data", "raw", "all data_forb and mantis.xlsx")
-
-# Load various sheets from that file
-## Data are not in 'tidy format' so need to do some careful wrangling
-df19_v0 <- readxl::read_excel(path = raw_path, sheet = "2019 field surveys")
-df20_v0 <- readxl::read_excel(path = raw_path, sheet = "2020 original conditions")
-df22_v0 <- readxl::read_excel(path = raw_path, sheet = "2022 treatment effects")
-
-## --------------------------------- ##
-# Wrangle 2019 Sheet (Plants) ----
-## --------------------------------- ##
+# Load the relevant sheet from that file
+df19_v0 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and mantis.xlsx"),
+                              sheet = "2019 field surveys")
 
 # Isolate first table of info
 df19_plants <- df19_v0 %>%
@@ -57,14 +48,7 @@ dplyr::glimpse(df19_plants)
 
 # Export locally
 write.csv(x = df19_plants, row.names = F, na = '',
-          file = file.path("data", "zhong_2019_plants.csv"))
-
-# Clear environment
-rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
-
-## --------------------------------- ##
-# Wrangle 2019 Sheet (Arthropods) ----
-## --------------------------------- ##
+          file = file.path("data", "zhong_2019_field-surveys_plants.csv"))
 
 # Isolate grasshopper info
 df19_ghop <- df19_v0 %>%
@@ -119,14 +103,18 @@ dplyr::glimpse(df19_arthro)
 
 # Export locally
 write.csv(x = df19_arthro, row.names = F, na = '',
-          file = file.path("data", "zhong_2019_arthropods.csv"))
+          file = file.path("data", "zhong_2019_field-surveys_arthropods.csv"))
 
 # Clear environment
-rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
+rm(list = ls()); gc()
 
 ## --------------------------------- ##
 # Wrangle 2020 Sheet ----
 ## --------------------------------- ##
+
+# Load the relevant sheet from that file
+df20_v0 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and mantis.xlsx"),
+                              sheet = "2020 original conditions")
 
 # Tidy the single table in the 2020 sheet
 df20_forbs <- df20_v0 %>%
@@ -158,16 +146,20 @@ dplyr::glimpse(df20_forbs)
 
 # Export locally
 write.csv(x = df20_forbs, row.names = F, na = '',
-          file = file.path("data", "zhong_2020_plants.csv"))
+          file = file.path("data", "zhong_2020_original-conditions.csv"))
 
 # Clear environment
-rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
+rm(list = ls()); gc()
 
 ## --------------------------------- ##
-# Wrangle 2022 Sheet (Leaf) ----
+# Wrangle 2022 Sheet ----
 ## --------------------------------- ##
 
-# Do needed wrangling
+# Load the relevant sheet from that file
+df22_v0 <- readxl::read_excel(path = file.path("data", "raw", "all data_forb and mantis.xlsx"),
+                              sheet = "2022 treatment effects")
+
+# Do needed wrangling for plant data
 df22_leaf <- df22_v0 %>%
   # Grab desired columns
   dplyr::select(`August, 2022, L. chinensis biomass, in the 2 m2 mesocosms`,
@@ -200,18 +192,7 @@ df22_leaf <- df22_v0 %>%
 # Check structure
 dplyr::glimpse(df22_leaf)
 
-# Export locally
-write.csv(x = df22_leaf, row.names = F, na = '',
-          file = file.path("data", "zhong_2020-2022_plants.csv"))
-
-# Clear environment
-rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
-
-## --------------------------------- ##
-# Wrangle 2022 Sheet (Grasshopper) ----
-## --------------------------------- ##
-
-# Do needed wrangling
+# Do needed wrangling for grasshopper data
 df22_ghop <- df22_v0 %>%
   # Grab desired columns
   dplyr::select(`August, 2022, L. chinensis biomass, in the 2 m2 mesocosms`,
@@ -257,18 +238,7 @@ df22_ghop <- df22_v0 %>%
 # Check structure
 dplyr::glimpse(df22_ghop)
 
-# Export locally
-write.csv(x = df22_ghop, row.names = F, na = '',
-          file = file.path("data", "zhong_2020-2022_grasshoppers.csv"))
-
-# Clear environment
-rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
-
-## --------------------------------- ##
-# Wrangle 2022 Sheet (Mantis) ----
-## --------------------------------- ##
-
-# Do needed wrangling
+# Do needed wrangling for mantis data
 df22_mantis <- df22_v0 %>%
   # Grab desired columns
   dplyr::select(...39:...41,
@@ -308,13 +278,25 @@ df22_mantis <- df22_v0 %>%
 # Check structure
 dplyr::glimpse(df22_mantis)
 
+# Need to join these together into one data object
+df22_v2 <- df22_leaf %>%
+  # Attach grasshopper data
+  dplyr::full_join(x = ., y = df22_ghop,
+                   by = c("year", "month", "block",
+                          "treatment_forb", "treatment_predator")) %>%
+  # Then attach mantis data
+  dplyr::full_join(x = ., y = df22_mantis,
+                   by = c("year", "month", "block",
+                          "treatment_forb", "treatment_predator"))
+
+# Check structure
+dplyr::glimpse(df22_v2)
+
 # Export locally
-write.csv(x = df22_mantis, row.names = F, na = '',
-          file = file.path("data", "zhong_2020-2022_mantis.csv"))
+write.csv(x = df22_v2, row.names = F, na = '',
+          file = file.path("data", "zhong_2020-2022_treatment-effects.csv"))
 
 # Clear environment
-rm(list = setdiff(ls(), c("raw_path", "df19_v0", "df20_v0", "df22_v0"))); gc()
-
-
+rm(list = ls()); gc()
 
 # End ----
