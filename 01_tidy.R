@@ -118,12 +118,44 @@ dplyr::glimpse(df19_arthro)
 write.csv(x = df19_arthro, row.names = F, na = '',
           file = file.path("data", "zhong_2019_arthropods.csv"))
 
+## --------------------------------- ##
+# Wrangle 2020 Sheet ----
+## --------------------------------- ##
+
+# Tidy the single table in the 2020 sheet
+df20_forbs <- df20_v0 %>%
+  # Drop empty columns
+  dplyr::select(-dplyr::where(fn = ~ all(is.na(.)))) %>%
+  # Rename columns with actual column name row
+  supportR::safe_rename(data = ., bad_names = names(.),
+                        good_names = as.character(.[1, ])) %>%
+  # Rename prettier / more machine-readable
+  dplyr::rename(block = Block,
+                treatment_forb = `Forb treatment`,
+                treatment_predator = `Predator treatment`,
+                forb_cover_perc = `forb cover (%)`,
+                leychin_cover_perc = `L. chinensis cover (%)`,
+                other_grass_cover_perc = `Other grasses cover (%)`,
+                spp_richness = `Species richness`) %>%
+  # Ditch remaining bad header row
+  dplyr::filter(!block %in% c("Block")) %>%
+  # Add some useful other information that was in the original headers
+  dplyr::mutate(year = 2020,
+                month = 6,
+                .before = block) %>%
+  # Get columns into right class
+  dplyr::mutate(dplyr::across(.cols = dplyr::ends_with("cover_perc"), .fns = as.numeric)) %>%
+  dplyr::mutate(block = paste0("block ", block))
+
+# Check structure
+dplyr::glimpse(df20_forbs)
+
+# Export locally
+write.csv(x = df20_forbs, row.names = F, na = '',
+          file = file.path("data", "zhong_2020_plants.csv"))
 
 ## --------------------------------- ##
 # ----
 ## --------------------------------- ##
-
-
-
 
 # End ----
