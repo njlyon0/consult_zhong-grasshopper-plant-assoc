@@ -254,7 +254,7 @@ ggsave(filename = file.path("graphs", "fig-4_grasshopper-response.png"),
        height = 8, width = 8, units = "in")
 
 # Partially clear environment
-rm(list = setdiff(ls(), c("field_df", "og_df", "trt_df"))); gc()
+rm(list = setdiff(ls(), c("field_df", "og_df", "trt_df", "forb_cols"))); gc()
 
 ## --------------------------------- ##
 # Supp. Fig. 1 (Field Survey) ----
@@ -290,8 +290,75 @@ ggsave(filename = file.path("graphs", "supp-fig-1_field-survey.png"),
 # Partially clear environment
 rm(list = setdiff(ls(), c("field_df", "og_df", "trt_df", "forb_cols"))); gc()
 
+## --------------------------------- ##
+# Supp. Fig. 2 (Mantis Behavior) ----
+## --------------------------------- ##
 
+# Stacked plots of mantis activity against forb treatment
 
+# Subset the treatment data to only predator information
+pred_df <- dplyr::filter(.data = trt_df, treatment_predator == "Predator")
+
+# Check structure
+dplyr::glimpse(pred_df)
+
+# Summarize the relevant bit of the table
+supfig2a_df <- supportR::summary_table(data = pred_df, response = "mean_mantis_walk_times_4h",
+                                    groups = c("treatment_forb", "treatment_predator"))
+
+# Graph grasshopper feeding count against treatment
+supfig2a <- ggplot(supfig2a_df, aes(x = treatment_forb, y = mean,
+                              fill = treatment_forb)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymax = mean + std_error, ymin = mean - std_error),
+                stat = "identity", width = 0.2) +
+  labs(y = "Walking (times/4h)") +
+  scale_fill_manual(values = forb_cols) +
+  ylim(0, 50) +
+  supportR::theme_lyon() +
+  theme(legend.position = "none",
+        axis.title.x = element_blank()); supfig2a
+
+# Summarize the relevant bit of the table
+supfig2b_df <- supportR::summary_table(data = pred_df, response = "mean_mantis_jump_times_4h",
+                                       groups = c("treatment_forb", "treatment_predator"))
+
+# Graph grasshopper feeding count against treatment
+supfig2b <- ggplot(supfig2b_df, aes(x = treatment_forb, y = mean, fill = treatment_forb)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymax = mean + std_error, ymin = mean - std_error),
+                stat = "identity", width = 0.2) +
+  labs(y = "Jumping (times/4h)") +
+  scale_fill_manual(values = forb_cols) +
+  ylim(0, 50) +
+  supportR::theme_lyon() +
+  theme(legend.position = "none",
+        axis.title.x = element_blank()); supfig2b
+
+# Summarize the relevant bit of the table
+supfig2c_df <- supportR::summary_table(data = pred_df, response = "mean_mantis_attack_times_4h",
+                                       groups = c("treatment_forb", "treatment_predator"))
+
+# Graph grasshopper feeding count against treatment
+supfig2c <- ggplot(supfig2c_df, aes(x = treatment_forb, y = mean, fill = treatment_forb)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymax = mean + std_error, ymin = mean - std_error),
+                stat = "identity", width = 0.2) +
+  labs(y = "Attacking (times/4h)") +
+  scale_fill_manual(values = forb_cols) +
+  ylim(0, 50) +
+  supportR::theme_lyon() +
+  theme(legend.position = "none",
+        axis.title.x = element_blank()); supfig2c
+
+# Get all graphs together
+cowplot::plot_grid(supfig2a, supfig2b, supfig2c, nrow = 3, labels = "AUTO", align = "v")
+
+# Export locally
+ggsave(filename = file.path("graphs", "supp-fig-2_mantis-response.png"),
+       height = 9, width = 4, units = "in")
+
+# Partially clear environment
+rm(list = setdiff(ls(), c("field_df", "og_df", "trt_df", "forb_cols"))); gc()
 
 # End ----
-
