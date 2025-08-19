@@ -12,6 +12,9 @@ parse_aov <- function(mod = NULL){
   if(is.null(mod) || all(c("aov", "lm") %in% class(mod) != T))
     stop("'mod' must be provided as an object returned by `stats::aov`")
 
+  # Grab the response variable from the model call
+  resp_var <- names(mod$model)[1]
+
   # Get the summary of the model
   mod_smry <- summary(object = mod)
 
@@ -22,6 +25,9 @@ parse_aov <- function(mod = NULL){
   mod_tidy <- mod_tab %>%
     # Get terms into a column
     tibble::rownames_to_column(.data = ., var = "fixed_effects") %>%
+    # Add the response variable before the fixed effect column
+    dplyr::mutate(response_var = resp_var,
+                  .before = dplyr::everything()) %>%
     # Drop sums of squares/mean squares
     dplyr::select(-dplyr::ends_with("Sq")) %>%
     # Tidy up remaining column names
