@@ -94,9 +94,69 @@ anova(lm_rich)
 # Partially clear environment
 rm(list = setdiff(x = ls(), y = c("parse_aov"))); gc()
 
+## --------------------------------- ##
+# Treatment Effects ----
+## --------------------------------- ##
 
+# Read in data
+trt_df <- read.csv(file.path("data", "zhong_2020-2022_treatment-effects.csv"))
 
+# Check structure
+dplyr::glimpse(trt_df)
 
+# Check whether L. chinensis biomass differs among treatments
+lm_bio <- lme4::lmer(leychin_biomass_g_m2 ~ treatment_forb * treatment_predator +
+                       (1 | block), data = trt_df)
+anova(lm_bio)
+
+# Do the same for L. chinensis leaf damage
+lm_dmg <- lme4::lmer(mean_leaf_damage_perc ~ treatment_forb * treatment_predator +
+                       (1 | block), data = trt_df)
+anova(lm_dmg)
+
+# Do the same for grasshopper feeding times
+lm_ghop.feed <- lme4::lmer(mean_grasshopper_feed_times_4h ~ treatment_forb * treatment_predator +
+                             (1 | block), data = trt_df)
+anova(lm_ghop.feed)
+
+# Do the same for grasshopper jumping times
+lm_ghop.jump <- lme4::lmer(mean_grasshopper_jump_times_4h ~ treatment_forb * treatment_predator +
+                             (1 | block), data = trt_df)
+anova(lm_ghop.jump)
+
+# Do the same for grasshopper walk times
+lm_ghop.walk <- lme4::lmer(mean_grasshopper_walk_times_4h ~ treatment_forb * treatment_predator +
+                             (1 | block), data = trt_df)
+anova(lm_ghop.walk)
+
+# Do the same for grasshopper mortality
+lm_ghop.mort <- lme4::lmer(mean_grasshopper_mortality_perc ~ treatment_forb * treatment_predator +
+                             (1 | block), data = trt_df)
+anova(lm_ghop.mort)
+
+# Subset to only the predator treatment
+pred_df <- trt_df %>%
+  dplyr::filter(treatment_predator == "Predator")
+
+# Check the structure
+dplyr::glimpse(pred_df)
+
+# Test effect of forb treatment on mantis attack times
+lm_mant.attack <- lme4::lmer(mean_mantis_attack_times_4h ~ treatment_forb + (1 | block),
+                           data = pred_df)
+anova(lm_mant.attack)
+
+# Do the same for mantis jump times
+lm_mant.jump <- lme4::lmer(mean_mantis_jump_times_4h ~ treatment_forb + (1 | block),
+                           data = pred_df)
+anova(lm_mant.jump)
+
+# Do the same for mantis walk times
+lm_mant.walk <- lme4::lmer(mean_mantis_walk_times_4h ~ treatment_forb + (1 | block),
+                           data = pred_df)
+anova(lm_mant.walk)
+
+# Clear environment
+rm(list = ls()); gc()
 
 # End ----
-
