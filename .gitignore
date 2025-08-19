@@ -82,4 +82,5 @@ vignettes/*.pdf
 
 # Folders to ignore
 data/
+results/
 graphs/
