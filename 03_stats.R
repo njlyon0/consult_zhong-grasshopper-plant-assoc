@@ -10,7 +10,7 @@
 ## --------------------------------- ##
 
 # Load libraries
-librarian::shelf(tidyverse)
+librarian::shelf(tidyverse, lme4)
 
 # Clear environment
 rm(list = ls()); gc()
@@ -60,6 +60,42 @@ write.csv(x = smry_dmg.mant, row.names = F, na = '',
 
 # Partially clear environment
 rm(list = setdiff(x = ls(), y = c("parse_aov"))); gc()
+
+## --------------------------------- ##
+# Original Conditions ----
+## --------------------------------- ##
+
+# Read in data
+og_df <- read.csv(file.path("data", "zhong_2020_original-conditions.csv"))
+
+# Check structure
+dplyr::glimpse(og_df)
+
+# Check whether forb differs among plots before the experiment was applied
+lm_forb <- lme4::lmer(forb_cover_perc ~ treatment_forb * treatment_predator +
+                        (1 | block), data = og_df)
+anova(lm_forb)
+
+# Do the same for L. chinensis ('leychin') cover
+lm_lchin <- lme4::lmer(leychin_cover_perc ~ treatment_forb * treatment_predator +
+                         (1 | block), data = og_df)
+anova(lm_lchin)
+
+# Do the same for other grass cover
+lm_grass <- lme4::lmer(other_grass_cover_perc ~ treatment_forb * treatment_predator +
+                         (1 | block), data = og_df)
+anova(lm_grass)
+
+# Do the same for species richness
+lm_rich <- lme4::lmer(spp_richness ~ treatment_forb * treatment_predator +
+                         (1 | block), data = og_df)
+anova(lm_rich)
+
+# Partially clear environment
+rm(list = setdiff(x = ls(), y = c("parse_aov"))); gc()
+
+
+
 
 
 # End ----
