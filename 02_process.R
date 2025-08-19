@@ -16,11 +16,11 @@ librarian::shelf(tidyverse, supportR)
 rm(list = ls()); gc()
 
 ## --------------------------------- ##
-# Arthropod Field Survey ----
+# Field Survey ----
 ## --------------------------------- ##
 
 # Read in file
-field_arthro <- read.csv(file.path("data", "zhong_2019_field-surveys_arthropods.csv"))
+field_arthro <- read.csv(file.path("data", "tidy", "zhong_2019_field-surveys_arthropods.csv"))
 
 # Check structure
 dplyr::glimpse(field_arthro)
@@ -44,9 +44,31 @@ field_arthro_v2 <- field_arthro %>%
 # Check structure
 dplyr::glimpse(field_arthro_v2)
 
+# Read in plant data from field survey
+field_plant <- read.csv(file.path("data", "tidy", "zhong_2019_field-surveys_plants.csv"))
+
+# Check structure
+dplyr::glimpse(field_plant)
+
+# Process that (slightly)
+field_plant_v2 <- field_plant %>%
+  # Ditch sample timing info
+  dplyr::select(-year, -month)
+
+# Check structure
+dplyr::glimpse(field_plant_v2)
+
+# Combine plant/arthropod info
+field_actual <- field_plant_v2 %>%
+  dplyr::full_join(x = ., y = field_arthro_v2,
+                   by = "plot")
+
+# Check structure
+dplyr::glimpse(field_actual)
+
 # Export locally
-write.csv(x = field_arthro_v2, row.names = F, na = '',
-          file = file.path("data", "zhong_2019_field-surveys_mean-arthropods.csv"))
+write.csv(x = field_actual, row.names = F, na = '',
+          file = file.path("data", "zhong_2019_field-surveys.csv"))
 
 ## --------------------------------- ##
 # Treatment Effects ----
