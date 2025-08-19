@@ -256,6 +256,39 @@ ggsave(filename = file.path("graphs", "fig-4_grasshopper-response.png"),
 # Partially clear environment
 rm(list = setdiff(ls(), c("field_df", "og_df", "trt_df"))); gc()
 
+## --------------------------------- ##
+# Supp. Fig. 1 (Field Survey) ----
+## --------------------------------- ##
+
+# stacked plots of leaf damage / grasshopper abundance versus L. chinensis cover
+
+# Check data structure
+dplyr::glimpse(field_df)
+
+# Graph L. chinensis against forb cover
+supfig1a <- ggplot(field_df, aes(x = leychin_cover_perc, y = leychin_leaf_damage_perc)) +
+  geom_point(size = 4, pch = 21, fill = "#99582a") +
+  labs(x = expression(paste(italic("L. chinensis"), " Cover")),
+       y = "Leaf Damage (%)") +
+  supportR::theme_lyon() +
+  theme(axis.title.x = element_blank()); supfig1a
+
+# Graph grasshopper abundance against forb cover
+supfig1b <- ggplot(field_df, aes(x = leychin_cover_perc, y = mean_grasshopper_abun_m2)) +
+  geom_point(size = 4, pch = 23, fill = "#a3b18a") +
+  labs(x = expression(paste(italic("L. chinensis"), " Cover (%)")),
+       y = expression(paste("Grasshopper Density (no./", m^2, ")"))) +
+  supportR::theme_lyon(); supfig1b
+
+# Get all graphs together
+cowplot::plot_grid(supfig1a, supfig1b, nrow = 2, labels = "AUTO", align = "v")
+
+# Export locally
+ggsave(filename = file.path("graphs", "supp-fig-1_field-survey.png"),
+       height = 8, width = 5, units = "in")
+
+# Partially clear environment
+rm(list = setdiff(ls(), c("field_df", "og_df", "trt_df", "forb_cols"))); gc()
 
 
 
