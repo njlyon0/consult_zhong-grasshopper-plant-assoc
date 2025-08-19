@@ -75,13 +75,13 @@ write.csv(x = field_actual, row.names = F, na = '',
 ## --------------------------------- ##
 
 # Read in data
-trt_effects <- read.csv(file.path("data", "zhong_2020-2022_treatment-effects_other.csv"))
+trt_arthro <- read.csv(file.path("data", "tidy", "zhong_2020-2022_treatment-effects_other.csv"))
 
 # Check structure
-dplyr::glimpse(trt_effects)
+dplyr::glimpse(trt_arthro)
 
 # Do needed summarization
-trt_effects_v2 <- trt_effects %>%
+trt_arthro_v2 <- trt_arthro %>%
   # Pivot to long format (makes summarization cleaner)
   tidyr::pivot_longer(cols = -year:-treatment_predator) %>%
   # Summarize across years
@@ -106,10 +106,31 @@ trt_effects_v2 <- trt_effects %>%
   dplyr::relocate(dplyr::contains("leaf_damage"), .after = treatment_predator)
 
 # Check structure
-dplyr::glimpse(trt_effects_v2)
+dplyr::glimpse(trt_arthro_v2)
+
+# Read in the treatment effects on L. chinensis ('leychin') biomass too
+trt_biomass <- read.csv(file.path("data", "tidy", "zhong_2020-2022_treatment-effects_leymus-chinesis-biomass.csv"))
+
+# Check structure
+dplyr::glimpse(trt_biomass)
+
+# Ditch sample timing information
+trt_biomass_v2 <- trt_biomass %>%
+  dplyr::select(-year, -month)
+
+# Check structure
+dplyr::glimpse(trt_biomass_v2)
+
+# Attach these together
+trt_actual <- trt_biomass_v2 %>%
+  dplyr::full_join(x = ., y = trt_arthro_v2,
+                   by = c("block", "treatment_forb", "treatment_predator"))
+
+# Check structure
+dplyr::glimpse(trt_actual)
 
 # Export locally
-write.csv(x = trt_effects_v2, row.names = F, na = '',
-          file = file.path("data", "zhong_2020-2022_treatment-effects_mean-other.csv"))
+write.csv(x = trt_actual, row.names = F, na = '',
+          file = file.path("data", "zhong_2020-2022_treatment-effects.csv"))
 
 # End ----
