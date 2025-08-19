@@ -50,7 +50,7 @@ dplyr::glimpse(df19_plants)
 
 # Export locally
 write.csv(x = df19_plants, row.names = F, na = '',
-          file = file.path("data", "zhong_2019_field-surveys_plants.csv"))
+          file = file.path("data", "tidy", "zhong_2019_field-surveys_plants.csv"))
 
 # Isolate grasshopper info
 df19_ghop <- df19_v1 %>%
@@ -105,7 +105,7 @@ dplyr::glimpse(df19_arthro)
 
 # Export locally
 write.csv(x = df19_arthro, row.names = F, na = '',
-          file = file.path("data", "zhong_2019_field-surveys_arthropods.csv"))
+          file = file.path("data", "tidy", "zhong_2019_field-surveys_arthropods.csv"))
 
 # Clear environment
 rm(list = ls()); gc()
@@ -148,7 +148,7 @@ dplyr::glimpse(df20_forbs)
 
 # Export locally
 write.csv(x = df20_forbs, row.names = F, na = '',
-          file = file.path("data", "zhong_2020_original-conditions.csv"))
+          file = file.path("data", "tidy", "zhong_2020_original-conditions.csv"))
 
 # Clear environment
 rm(list = ls()); gc()
@@ -188,7 +188,7 @@ dplyr::glimpse(df22_lechin)
 
 # Export locally
 write.csv(x = df22_lechin, row.names = F, na = '',
-          file = file.path("data", "zhong_2020-2022_treatment-effects_leymus-chinesis-biomass.csv"))
+          file = file.path("data", "tidy", "zhong_2020-2022_treatment-effects_leymus-chinesis-biomass.csv"))
 
 # Do needed wrangling for plant data
 df22_leaf <- df22_v1 %>%
@@ -322,7 +322,7 @@ dplyr::glimpse(df22_v2)
 
 # Export locally
 write.csv(x = df22_v2, row.names = F, na = '',
-          file = file.path("data", "zhong_2020-2022_treatment-effects_other.csv"))
+          file = file.path("data", "tidy", "zhong_2020-2022_treatment-effects_other.csv"))
 
 # Clear environment
 rm(list = ls()); gc()
