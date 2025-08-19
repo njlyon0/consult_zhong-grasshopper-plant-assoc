@@ -147,8 +147,9 @@ df20_forbs <- df20_v1 %>%
 dplyr::glimpse(df20_forbs)
 
 # Export locally
+## Note this is ready for analysis as-is so it's saved to the 'data' folder instead of a subfolder
 write.csv(x = df20_forbs, row.names = F, na = '',
-          file = file.path("data", "tidy", "zhong_2020_original-conditions.csv"))
+          file = file.path("data", "zhong_2020_original-conditions.csv"))
 
 # Clear environment
 rm(list = ls()); gc()
