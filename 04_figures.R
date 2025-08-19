@@ -43,7 +43,8 @@ fig2a <- ggplot(field_df, aes(x = forb_cover_perc, y = leychin_leaf_damage_perc)
   geom_point(size = 4, pch = 21, fill = "#99582a") +
   geom_smooth(method = "lm", formula = "y ~ x", se = F, color = "#000") +
   labs(x = "Forb Cover (%)", y = "Leaf Damage (%)") +
-  supportR::theme_lyon(); fig2a
+  supportR::theme_lyon() +
+  theme(axis.title.x = element_blank()); fig2a
 
 # Graph L. chinensis against mantis abundance
 fig2b <- ggplot(field_df, aes(x = mean_mantis_abun_m2, y = leychin_leaf_damage_perc)) +
@@ -51,7 +52,8 @@ fig2b <- ggplot(field_df, aes(x = mean_mantis_abun_m2, y = leychin_leaf_damage_p
   geom_smooth(method = "lm", formula = "y ~ x", se = F, color = "#000") +
   labs(x = expression(paste("Mantis Density (no./", m^2, ")")),
        y = "Leaf Damage (%)") +
-  supportR::theme_lyon(); fig2b
+  supportR::theme_lyon() +
+  theme(axis.title = element_blank()); fig2b
 
 # Graph grasshopper abundance against forb cover
 fig2c <- ggplot(field_df, aes(x = forb_cover_perc, y = mean_grasshopper_abun_m2)) +
@@ -67,10 +69,11 @@ fig2d <- ggplot(field_df, aes(x = mean_mantis_abun_m2, y = mean_grasshopper_abun
   # geom_smooth(method = "lm", formula = "y ~ x", se = F, color = "#000") +
   labs(x = expression(paste("Mantis Density (no./", m^2, ")")),
        y = expression(paste("Grasshopper Density (no./", m^2, ")"))) +
-  supportR::theme_lyon(); fig2d
+  supportR::theme_lyon() +
+  theme(axis.title.y = element_blank()); fig2d
 
 # Get all graphs together
-cowplot::plot_grid(fig2a, fig2b, fig2c, fig2d, nrow = 2, labels = "AUTO", align = "v")
+cowplot::plot_grid(fig2a, fig2b, fig2c, fig2d, nrow = 2, labels = "AUTO", align = "hv")
 
 # Export locally
 ggsave(filename = file.path("graphs", "fig-2_field-survey.png"),
