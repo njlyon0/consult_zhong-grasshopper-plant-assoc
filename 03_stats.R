@@ -88,7 +88,7 @@ anova(lm_grass)
 
 # Do the same for species richness
 lm_rich <- lme4::lmer(spp_richness ~ treatment_forb * treatment_predator +
-                         (1 | block), data = og_df)
+                        (1 | block), data = og_df)
 anova(lm_rich)
 
 # Partially clear environment
@@ -143,7 +143,7 @@ dplyr::glimpse(pred_df)
 
 # Test effect of forb treatment on mantis attack times
 lm_mant.attack <- lme4::lmer(mean_mantis_attack_times_4h ~ treatment_forb + (1 | block),
-                           data = pred_df)
+                             data = pred_df)
 anova(lm_mant.attack)
 
 # Do the same for mantis jump times
