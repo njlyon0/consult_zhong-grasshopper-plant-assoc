@@ -80,7 +80,7 @@ ggsave(filename = file.path("graphs", "fig-2_field-survey.png"),
        height = 8, width = 8, units = "in")
 
 # Partially clear environment
-rm(list = setdiff(ls(), c("field_df", "og_df", "trt_df"))); gc()
+rm(list = setdiff(ls(), c("field_df", "og_df", "trt_df", "forb_cols"))); gc()
 
 ## --------------------------------- ##
 # Fig. 3 (Treatment Effect - L. chinensis) ----
@@ -146,7 +146,119 @@ ggsave(filename = file.path("graphs", "fig-3_l-chinensis-response.png"),
        height = 7, width = 4, units = "in")
 
 # Partially clear environment
+rm(list = setdiff(ls(), c("field_df", "og_df", "trt_df", "forb_cols"))); gc()
+
+## --------------------------------- ##
+# Fig. 4 (Treatment Effect - Grasshoppers) ----
+## --------------------------------- ##
+
+# 2x2 grid for grasshopper response to factorial treatments
+
+# Check structure of relevant data
+dplyr::glimpse(trt_df)
+
+# Summarize the relevant bit of the table
+fig4a_df <- supportR::summary_table(data = trt_df, response = "mean_grasshopper_feed_times_4h",
+                                    groups = c("treatment_forb", "treatment_predator"))
+
+# Graph grasshopper feeding count against treatment
+fig4a <- ggplot(fig4a_df, aes(x = treatment_predator, y = mean,
+                              fill = treatment_forb)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) +
+  geom_errorbar(aes(ymax = mean + std_error,
+                    ymin = mean - std_error),
+                position = position_dodge(width = 1),
+                stat = "identity", width = 0.2) +
+  labs(y = "Feeding (times/4h)") +
+  scale_fill_manual(values = forb_cols) +
+  geom_text(label = "b", x = 0.75, y = 30, size = 6) +
+  geom_text(label = "a", x = 1.25, y = 40, size = 6) +
+  geom_text(label = "b", x = 1.75, y = 25, size = 6) +
+  geom_text(label = "b", x = 2.25, y = 26, size = 6) +
+  ylim(0, 40) +
+  supportR::theme_lyon() +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.8, 0.9),
+        axis.title.x = element_blank()); fig4a
+
+# Summarize the relevant bit of the table
+fig4b_df <- supportR::summary_table(data = trt_df, response = "mean_grasshopper_walk_times_4h",
+                                    groups = c("treatment_forb", "treatment_predator"))
+
+# Graph grasshopper feeding count against treatment
+fig4b <- ggplot(fig4b_df, aes(x = treatment_predator, y = mean,
+                              fill = treatment_forb)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) +
+  geom_errorbar(aes(ymax = mean + std_error,
+                    ymin = mean - std_error),
+                position = position_dodge(width = 1),
+                stat = "identity", width = 0.2) +
+  labs(y = "Walking (times/4h)") +
+  scale_fill_manual(values = forb_cols) +
+  geom_text(label = "b", x = 0.75, y = 55, size = 6) +
+  geom_text(label = "a", x = 1.25, y = 43, size = 6) +
+  geom_text(label = "c", x = 1.75, y = 62, size = 6) +
+  geom_text(label = "c", x = 2.25, y = 63, size = 6) +
+  ylim(0, 65) +
+  supportR::theme_lyon() +
+  theme(legend.position = "none",
+        axis.title.x = element_blank()); fig4b
+
+# Summarize the relevant bit of the table
+fig4c_df <- supportR::summary_table(data = trt_df, response = "mean_grasshopper_jump_times_4h",
+                                    groups = c("treatment_forb", "treatment_predator"))
+
+# Graph grasshopper feeding count against treatment
+fig4c <- ggplot(fig4c_df, aes(x = treatment_predator, y = mean,
+                              fill = treatment_forb)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) +
+  geom_errorbar(aes(ymax = mean + std_error,
+                    ymin = mean - std_error),
+                position = position_dodge(width = 1),
+                stat = "identity", width = 0.2) +
+  labs(y = "Feeding (times/4 h)") +
+  scale_fill_manual(values = forb_cols) +
+  ylim(0, 40) +
+  supportR::theme_lyon() +
+  theme(legend.position = "none",
+        axis.title.x = element_blank()); fig4c
+
+# Summarize the relevant bit of the table
+fig4d_df <- supportR::summary_table(data = trt_df, response = "mean_grasshopper_mortality_perc",
+                                    groups = c("treatment_forb", "treatment_predator"))
+
+# Graph grasshopper feeding count against treatment
+fig4d <- ggplot(fig4d_df, aes(x = treatment_predator, y = mean,
+                              fill = treatment_forb)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) +
+  geom_errorbar(aes(ymax = mean + std_error,
+                    ymin = mean - std_error),
+                position = position_dodge(width = 1),
+                stat = "identity", width = 0.2) +
+  labs(y = "Mortality Rate (%)") +
+  scale_fill_manual(values = forb_cols) +
+  geom_text(label = "b", x = 0.75, y = 50, size = 6) +
+  geom_text(label = "a", x = 1.25, y = 35, size = 6) +
+  geom_text(label = "bc", x = 1.75, y = 60, size = 6) +
+  geom_text(label = "c", x = 2.25, y = 63, size = 6) +
+  ylim(0, 65) +
+  supportR::theme_lyon() +
+  theme(legend.position = "none",
+        axis.title.x = element_blank()); fig4d
+
+# Assemble figure
+cowplot::plot_grid(fig4a, fig4b, fig4c, fig4d, nrow = 2, labels = "AUTO", align = "hv")
+
+# Export locally
+ggsave(filename = file.path("graphs", "fig-4_grasshopper-response.png"),
+       height = 8, width = 8, units = "in")
+
+# Partially clear environment
 rm(list = setdiff(ls(), c("field_df", "og_df", "trt_df"))); gc()
+
+
+
+
 
 # End ----
 
